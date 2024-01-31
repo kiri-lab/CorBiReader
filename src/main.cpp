@@ -14,9 +14,12 @@ void setup()
   delay(500);
 
   M5.Lcd.setRotation(3);
-  M5.Lcd.print("Farewell World\n");
-  M5.Lcd.print("It's CorBi\n");
-  M5.Lcd.print("made by kiri-lab\n");
+  M5.Lcd.setTextFont(4);
+  M5.Lcd.println("Farewell World");
+  M5.Lcd.println("It's CorBi");
+  M5.Lcd.print("made by ");
+  M5.Lcd.setTextColor(TFT_PURPLE);
+  M5.Lcd.println("kiri-lab");
 
   xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
   pinMode(19, OUTPUT);
