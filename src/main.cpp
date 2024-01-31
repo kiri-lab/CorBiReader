@@ -63,6 +63,7 @@ void setup()
   M5.Lcd.println("HR");
   M5.Lcd.println("O2");
 
+<<<<<<< HEAD
   BLEDevice::init("CorBi");
   BLEServer *pServer = BLEDevice::createServer();
   pServer->setCallbacks(new CorBiServerCallbacks());
@@ -71,6 +72,9 @@ void setup()
 
   xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
   // xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
+=======
+  xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
+>>>>>>> 5640af2 (✏️ update main.cpp)
   // xTaskCreatePinnedToCore(pulseOximeter, "MAX30100", 4096, NULL, 2, NULL, 1);
   pinMode(19, OUTPUT);
 }
