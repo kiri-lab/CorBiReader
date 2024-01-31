@@ -71,32 +71,39 @@ void setup()
   startAdvertising();
 
   xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
+<<<<<<< HEAD
   // xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
 =======
   xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
 >>>>>>> 5640af2 (✏️ update main.cpp)
   // xTaskCreatePinnedToCore(pulseOximeter, "MAX30100", 4096, NULL, 2, NULL, 1);
+=======
+  xTaskCreatePinnedToCore(pulseOximeter, "MAX30100", 4096, NULL, 2, NULL, 1);
+>>>>>>> e48518e (✏️ update main.cpp)
   pinMode(19, OUTPUT);
 }
 
 void loop()
 {
-  pox.update();
-  if (millis() - tsLastReport > REPORTING_PERIOD_MS)
-  {
-    M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
-    M5.Lcd.setCursor(40, 80);
-    M5.Lcd.print(pox.getHeartRate());
-
-    M5.Lcd.setCursor(40, 100);
-    M5.Lcd.print(pox.getSpO2());
-
-    tsLastReport = millis();
-  }
 }
 
 void pulseOximeter(void *arg)
 {
+  for (;;)
+  {
+    pox.update();
+    if (millis() - tsLastReport > REPORTING_PERIOD_MS)
+    {
+      M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
+      M5.Lcd.setCursor(40, 80);
+      M5.Lcd.print(pox.getHeartRate());
+
+      M5.Lcd.setCursor(40, 100);
+      M5.Lcd.print(pox.getSpO2());
+
+      tsLastReport = millis();
+    }
+  }
 }
 
 // FIXME いいからプロトタイピングだ！してるので、規格違反してたら後から直してください
