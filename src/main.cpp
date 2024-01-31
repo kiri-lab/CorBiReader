@@ -13,6 +13,7 @@ void setup()
   Serial.begin(115200);
   delay(500);
 
+  M5.Lcd.setRotation(3);
   M5.Lcd.print("Farewell World\n");
   M5.Lcd.print("It's CorBi\n");
   M5.Lcd.print("made by kiri-lab\n");
