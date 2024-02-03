@@ -68,11 +68,11 @@ void setup()
   M5.Lcd.println("HR");
   M5.Lcd.println("O2");
 
-  // BLEDevice::init("CorBi");
+  BLEDevice::init("CorBi"); // FIXME こいつ動かすと心拍が取得できなくなる
   // BLEServer *pServer = BLEDevice::createServer();
-  // pServer->setCallbacks(new CorBiServerCallbacks());
-  // startService(pServer);
-  // startAdvertising();
+  //  pServer->setCallbacks(new CorBiServerCallbacks());
+  //  startService(pServer);
+  //  startAdvertising();
 
   // xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
   // xTaskCreatePinnedToCore(pulseOximeter, "MAX30100", 4096, NULL, 2, NULL, 1);
