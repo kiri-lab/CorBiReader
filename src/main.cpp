@@ -8,7 +8,7 @@
 #define CHARA_PO_HR_UUID "0c1f518c-ffdf-4b0f-8f2f-ca1edc6dabae"           // 心拍数
 #define Descriptor "55987ddf-24d7-4db8-a4b2-2731852036cd"
 #define CHARA_PO_O2_UUID "1d5b21fa-1a88-4ccb-8be8-9d8f07b0180c" // 酸素濃度
-#define REPORTING_PERIOD_MS 1000
+#define REPORTING_PERIOD_MS 10
 
 void pulseOximeter(void *arg);
 
@@ -23,6 +23,7 @@ void startAdvertising();
 
 PulseOximeter pox;
 uint32_t tsLastReport = 0;
+BLECharacteristic *pCharaPOHR;
 
 class CorBiServerCallbacks : public BLEServerCallbacks
 {
@@ -46,7 +47,7 @@ void setup()
 
   if (!pox.begin())
   {
-    Serial.println("FAILED");
+    M5.Lcd.println("FAILED");
   }
   else
   {
@@ -70,7 +71,7 @@ void setup()
   startService(pServer);
   startAdvertising();
 
-  xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
+  // xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
   // xTaskCreatePinnedToCore(pulseOximeter, "MAX30100", 4096, NULL, 2, NULL, 1);
   pinMode(19, OUTPUT);
 }
@@ -82,10 +83,14 @@ void loop()
   {
     M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
     M5.Lcd.setCursor(40, 80);
-    M5.Lcd.print(pox.getHeartRate());
+    float hr = pox.getHeartRate();
+    M5.Lcd.print(hr);
 
     M5.Lcd.setCursor(40, 100);
     M5.Lcd.print(pox.getSpO2());
+
+    pCharaPOHR->setValue(hr);
+    pCharaPOHR->notify();
 
     tsLastReport = millis();
   }
@@ -104,7 +109,7 @@ void startService(BLEServer *pServer)
   // BLEService *pService = pServer->createService(BLEUUID(SERVICE_PULSEOXIMETER_UUID), (uint32_t)0x2800, (uint8_t)0x00); // FIXME ハードコーディングしてるけど、どうしよ
   BLEService *pService = pServer->createService(SERVICE_PULSEOXIMETER_UUID);
 
-  BLECharacteristic *pCharaPOHR = pService->createCharacteristic(
+  pCharaPOHR = pService->createCharacteristic(
       CHARA_PO_HR_UUID,
       BLECharacteristic::PROPERTY_READ |
           BLECharacteristic::PROPERTY_WRITE);
