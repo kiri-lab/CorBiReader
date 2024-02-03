@@ -8,7 +8,7 @@
 #define CHARA_PO_HR_UUID "0c1f518c-ffdf-4b0f-8f2f-ca1edc6dabae"           // 心拍数
 #define Descriptor "55987ddf-24d7-4db8-a4b2-2731852036cd"
 #define CHARA_PO_O2_UUID "1d5b21fa-1a88-4ccb-8be8-9d8f07b0180c" // 酸素濃度
-#define REPORTING_PERIOD_MS 10
+#define REPORTING_PERIOD_MS 100
 
 void pulseOximeter(void *arg);
 
@@ -18,25 +18,28 @@ void morseDash();
 void morseLetterPulse();
 void morseWordPulse();
 
-void startService(BLEServer *pServer);
-void startAdvertising();
+// Issue #10
+// 同居させた瞬間心拍が取得できなくなったので原因を探る
+
+// void startService(BLEServer *pServer);
+// void startAdvertising();
 
 PulseOximeter pox;
 uint32_t tsLastReport = 0;
-BLECharacteristic *pCharaPOHR;
+// BLECharacteristic *pCharaPOHR;
 
-class CorBiServerCallbacks : public BLEServerCallbacks
-{
-  void onConnect(BLEServer *pServer)
-  {
-    M5.Lcd.println("Connected");
-  }
+// class CorBiServerCallbacks : public BLEServerCallbacks
+// {
+//   void onConnect(BLEServer *pServer)
+//   {
+//     M5.Lcd.println("Connected");
+//   }
 
-  void onDisconnect(BLEServer *pServer)
-  {
-    M5.Lcd.println("Disconnected");
-  }
-};
+//   void onDisconnect(BLEServer *pServer)
+//   {
+//     M5.Lcd.println("Disconnected");
+//   }
+// };
 
 void setup()
 {
@@ -65,11 +68,11 @@ void setup()
   M5.Lcd.println("HR");
   M5.Lcd.println("O2");
 
-  BLEDevice::init("CorBi");
-  BLEServer *pServer = BLEDevice::createServer();
-  pServer->setCallbacks(new CorBiServerCallbacks());
-  startService(pServer);
-  startAdvertising();
+  // BLEDevice::init("CorBi");
+  // BLEServer *pServer = BLEDevice::createServer();
+  // pServer->setCallbacks(new CorBiServerCallbacks());
+  // startService(pServer);
+  // startAdvertising();
 
   // xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
   // xTaskCreatePinnedToCore(pulseOximeter, "MAX30100", 4096, NULL, 2, NULL, 1);
@@ -89,8 +92,8 @@ void loop()
     M5.Lcd.setCursor(40, 100);
     M5.Lcd.print(pox.getSpO2());
 
-    pCharaPOHR->setValue(hr);
-    pCharaPOHR->notify();
+    // pCharaPOHR->setValue(hr);
+    // pCharaPOHR->notify();
 
     tsLastReport = millis();
   }
@@ -103,32 +106,32 @@ void pulseOximeter(void *arg)
 // FIXME いいからプロトタイピングだ！してるので、規格違反してたら後から直してください
 // 機能の実装を一旦優先します。
 
-void startService(BLEServer *pServer)
-{
-  // 0x2800はプライマリサービス、0x00はインスタンスID
-  // BLEService *pService = pServer->createService(BLEUUID(SERVICE_PULSEOXIMETER_UUID), (uint32_t)0x2800, (uint8_t)0x00); // FIXME ハードコーディングしてるけど、どうしよ
-  BLEService *pService = pServer->createService(SERVICE_PULSEOXIMETER_UUID);
+// void startService(BLEServer *pServer)
+// {
+//   // 0x2800はプライマリサービス、0x00はインスタンスID
+//   // BLEService *pService = pServer->createService(BLEUUID(SERVICE_PULSEOXIMETER_UUID), (uint32_t)0x2800, (uint8_t)0x00); // FIXME ハードコーディングしてるけど、どうしよ
+//   BLEService *pService = pServer->createService(SERVICE_PULSEOXIMETER_UUID);
 
-  pCharaPOHR = pService->createCharacteristic(
-      CHARA_PO_HR_UUID,
-      BLECharacteristic::PROPERTY_READ |
-          BLECharacteristic::PROPERTY_WRITE);
-  BLEDescriptor *pDescriptor = new BLEDescriptor(BLEUUID((uint16_t)0x0963)); // FIXME ハードコーディング
-  // pDescriptor->setValue((uint8_t *)64, 1); // FIXME 使い方いまいち分からん
-  pDescriptor->setValue("Heart Rate"); // Stringで指定ならいける
-  pCharaPOHR->addDescriptor(pDescriptor);
+//   pCharaPOHR = pService->createCharacteristic(
+//       CHARA_PO_HR_UUID,
+//       BLECharacteristic::PROPERTY_READ |
+//           BLECharacteristic::PROPERTY_WRITE);
+//   BLEDescriptor *pDescriptor = new BLEDescriptor(BLEUUID((uint16_t)0x0963)); // FIXME ハードコーディング
+//   // pDescriptor->setValue((uint8_t *)64, 1); // FIXME 使い方いまいち分からん
+//   pDescriptor->setValue("Heart Rate"); // Stringで指定ならいける
+//   pCharaPOHR->addDescriptor(pDescriptor);
 
-  pCharaPOHR->setValue("963");
-  pService->start();
-}
+//   pCharaPOHR->setValue("963");
+//   pService->start();
+// }
 
-void startAdvertising()
-{
-  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
-  pAdvertising->addServiceUUID(SERVICE_PULSEOXIMETER_UUID);
-  pAdvertising->setScanResponse(true);
-  BLEDevice::startAdvertising();
-}
+// void startAdvertising()
+// {
+//   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+//   pAdvertising->addServiceUUID(SERVICE_PULSEOXIMETER_UUID);
+//   pAdvertising->setScanResponse(true);
+//   BLEDevice::startAdvertising();
+// }
 
 int timeUnit = 50;
 void morseLED(void *arg)
