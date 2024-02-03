@@ -48,14 +48,12 @@ void setup()
   Serial.begin(115200);
   delay(500);
 
-  if (!pox.begin())
-  {
-    M5.Lcd.println("FAILED");
-  }
-  else
-  {
-    Serial.println("SUCCESS");
-  }
+  BLEDevice::init("CorBi"); // FIXME こいつ動かすと心拍が取得できなくなる
+  // NOTE 最初に初期化すれば、poxは動いた
+  // BLEServer *pServer = BLEDevice::createServer();
+  //  pServer->setCallbacks(new CorBiServerCallbacks());
+  //  startService(pServer);
+  //  startAdvertising();
 
   M5.Lcd.setRotation(3);
   M5.Lcd.setTextFont(4);
@@ -68,11 +66,14 @@ void setup()
   M5.Lcd.println("HR");
   M5.Lcd.println("O2");
 
-  BLEDevice::init("CorBi"); // FIXME こいつ動かすと心拍が取得できなくなる
-  // BLEServer *pServer = BLEDevice::createServer();
-  //  pServer->setCallbacks(new CorBiServerCallbacks());
-  //  startService(pServer);
-  //  startAdvertising();
+  if (!pox.begin())
+  {
+    M5.Lcd.println("FAILED");
+  }
+  else
+  {
+    Serial.println("SUCCESS");
+  }
 
   // xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
   // xTaskCreatePinnedToCore(pulseOximeter, "MAX30100", 4096, NULL, 2, NULL, 1);
