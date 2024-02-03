@@ -17,6 +17,19 @@ void morseWordPulse();
 void startService(BLEServer *pServer);
 void startAdvertising();
 
+class CorBiServerCallbacks : public BLEServerCallbacks
+{
+  void onConnect(BLEServer *pServer)
+  {
+    M5.Lcd.println("Connected");
+  }
+
+  void onDisconnect(BLEServer *pServer)
+  {
+    M5.Lcd.println("Disconnected");
+  }
+};
+
 void setup()
 {
   M5.begin();
@@ -34,6 +47,7 @@ void setup()
 
   BLEDevice::init("CorBi");
   BLEServer *pServer = BLEDevice::createServer();
+  pServer->setCallbacks(new CorBiServerCallbacks());
   startService(pServer);
   startAdvertising();
 
