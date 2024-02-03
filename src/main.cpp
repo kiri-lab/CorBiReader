@@ -45,20 +45,25 @@ void loop()
 {
 }
 
+// FIXME いいからプロトタイピングだ！してるので、規格違反してたら後から直してください
+// 機能の実装を一旦優先します。
+
 void startService(BLEServer *pServer)
 {
+  // 0x2800はプライマリサービス、0x00はインスタンスID
+  // BLEService *pService = pServer->createService(BLEUUID(SERVICE_PULSEOXIMETER_UUID), (uint32_t)0x2800, (uint8_t)0x00); // FIXME ハードコーディングしてるけど、どうしよ
   BLEService *pService = pServer->createService(SERVICE_PULSEOXIMETER_UUID);
 
-  BLECharacteristic *pCharacteristic = pService->createCharacteristic(
+  BLECharacteristic *pCharaPOHR = pService->createCharacteristic(
       CHARA_PO_HR_UUID,
       BLECharacteristic::PROPERTY_READ |
           BLECharacteristic::PROPERTY_WRITE);
   BLEDescriptor *pDescriptor = new BLEDescriptor(BLEUUID((uint16_t)0x0963)); // FIXME ハードコーディング
   // pDescriptor->setValue((uint8_t *)64, 1); // FIXME 使い方いまいち分からん
   pDescriptor->setValue("Heart Rate"); // Stringで指定ならいける
-  pCharacteristic->addDescriptor(pDescriptor);
+  pCharaPOHR->addDescriptor(pDescriptor);
 
-  pCharacteristic->setValue("Farewell World");
+  pCharaPOHR->setValue("963");
   pService->start();
 }
 
