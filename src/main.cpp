@@ -7,6 +7,9 @@
 #define CHARA_PO_HR_UUID "0c1f518c-ffdf-4b0f-8f2f-ca1edc6dabae"           // 心拍数
 #define Descriptor "55987ddf-24d7-4db8-a4b2-2731852036cd"
 #define CHARA_PO_O2_UUID "1d5b21fa-1a88-4ccb-8be8-9d8f07b0180c" // 酸素濃度
+#include <MAX30100_PulseOximeter.h>
+
+void pulseOximeter(void *arg);
 
 void morseLED(void *arg);
 void morseDot();
@@ -29,6 +32,9 @@ class CorBiServerCallbacks : public BLEServerCallbacks
     M5.Lcd.println("Disconnected");
   }
 };
+#define REPORTING_PERIOD_MS 1000
+PulseOximeter pox;
+uint32_t tsLastReport = 0;
 
 void setup()
 {
@@ -37,13 +43,25 @@ void setup()
   Serial.begin(115200);
   delay(500);
 
+  if (!pox.begin())
+  {
+    Serial.println("FAILED");
+  }
+  else
+  {
+    Serial.println("SUCCESS");
+  }
+
   M5.Lcd.setRotation(3);
   M5.Lcd.setTextFont(4);
   M5.Lcd.println("Farewell World");
   M5.Lcd.println("It's CorBi");
   M5.Lcd.print("made by ");
-  M5.Lcd.setTextColor(TFT_PURPLE);
+  M5.Lcd.setTextColor(TFT_PURPLE, TFT_BLACK);
   M5.Lcd.println("kiri-lab");
+  M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
+  M5.Lcd.println("HR");
+  M5.Lcd.println("O2");
 
   BLEDevice::init("CorBi");
   BLEServer *pServer = BLEDevice::createServer();
@@ -52,10 +70,28 @@ void setup()
   startAdvertising();
 
   xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
+  // xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
+  // xTaskCreatePinnedToCore(pulseOximeter, "MAX30100", 4096, NULL, 2, NULL, 1);
   pinMode(19, OUTPUT);
 }
 
 void loop()
+{
+  pox.update();
+  if (millis() - tsLastReport > REPORTING_PERIOD_MS)
+  {
+    M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
+    M5.Lcd.setCursor(40, 80);
+    M5.Lcd.print(pox.getHeartRate());
+
+    M5.Lcd.setCursor(40, 100);
+    M5.Lcd.print(pox.getSpO2());
+
+    tsLastReport = millis();
+  }
+}
+
+void pulseOximeter(void *arg)
 {
 }
 
