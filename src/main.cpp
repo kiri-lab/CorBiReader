@@ -2,12 +2,13 @@
 #include <BLEDevice.h>
 #include <BLE2902.h>
 #include <BLEUUID.h>
+#include <MAX30100_PulseOximeter.h>
 
 #define SERVICE_PULSEOXIMETER_UUID "c360fb9d-497f-4a0d-bfd3-6cbecd1786e1" // パルスオキシメータ
 #define CHARA_PO_HR_UUID "0c1f518c-ffdf-4b0f-8f2f-ca1edc6dabae"           // 心拍数
 #define Descriptor "55987ddf-24d7-4db8-a4b2-2731852036cd"
 #define CHARA_PO_O2_UUID "1d5b21fa-1a88-4ccb-8be8-9d8f07b0180c" // 酸素濃度
-#include <MAX30100_PulseOximeter.h>
+#define REPORTING_PERIOD_MS 1000
 
 void pulseOximeter(void *arg);
 
@@ -19,6 +20,9 @@ void morseWordPulse();
 
 void startService(BLEServer *pServer);
 void startAdvertising();
+
+PulseOximeter pox;
+uint32_t tsLastReport = 0;
 
 class CorBiServerCallbacks : public BLEServerCallbacks
 {
@@ -32,9 +36,6 @@ class CorBiServerCallbacks : public BLEServerCallbacks
     M5.Lcd.println("Disconnected");
   }
 };
-#define REPORTING_PERIOD_MS 1000
-PulseOximeter pox;
-uint32_t tsLastReport = 0;
 
 void setup()
 {
@@ -70,7 +71,6 @@ void setup()
   startAdvertising();
 
   xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
-  // xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
   // xTaskCreatePinnedToCore(pulseOximeter, "MAX30100", 4096, NULL, 2, NULL, 1);
   pinMode(19, OUTPUT);
 }
