@@ -17,6 +17,7 @@ void morseDash();
 void morseLetterPulse();
 void morseWordPulse();
 
+<<<<<<< HEAD
 void startService(BLEServer *pServer);
 void startAdvertising();
 
@@ -33,6 +34,9 @@ class CorBiServerCallbacks : public BLEServerCallbacks
   }
 };
 #define REPORTING_PERIOD_MS 1000
+=======
+#define REPORTING_PERIOD_MS 10
+>>>>>>> 355fe74 (✏️ update main.cpp)
 PulseOximeter pox;
 uint32_t tsLastReport = 0;
 
