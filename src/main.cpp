@@ -2,13 +2,19 @@
 #include <BLEDevice.h>
 #include <BLE2902.h>
 #include <BLEUUID.h>
-#include <MAX30100_PulseOximeter.h>
+#include <MAX30100.h>
 
 #define SERVICE_PULSEOXIMETER_UUID "c360fb9d-497f-4a0d-bfd3-6cbecd1786e1" // パルスオキシメータ
 #define CHARA_PO_HR_UUID "0c1f518c-ffdf-4b0f-8f2f-ca1edc6dabae"           // 心拍数
 #define Descriptor "55987ddf-24d7-4db8-a4b2-2731852036cd"
 #define CHARA_PO_O2_UUID "1d5b21fa-1a88-4ccb-8be8-9d8f07b0180c" // 酸素濃度
-#define REPORTING_PERIOD_MS 100
+#define REPORTING_PERIOD_MS 10
+
+#define SAMPLING_RATE MAX30100_SAMPRATE_100HZ
+#define IR_LED_CURRENT MAX30100_LED_CURR_50MA
+#define RED_LED_CURRENT MAX30100_LED_CURR_27_1MA
+#define PULSE_WIDTH MAX30100_SPC_PW_1600US_16BITS
+#define HIGHRES_MODE true
 
 void pulseOximeter(void *arg);
 
@@ -24,7 +30,8 @@ void morseWordPulse();
 void startService(BLEServer *pServer);
 void startAdvertising();
 
-PulseOximeter pox;
+// PulseOximeter pox;
+MAX30100 MAX30100;
 uint32_t tsLastReport = 0;
 BLECharacteristic *pCharaPOHR;
 
@@ -63,10 +70,10 @@ void setup()
   M5.Lcd.setTextColor(TFT_PURPLE, TFT_BLACK);
   M5.Lcd.println("kiri-lab");
   M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
-  M5.Lcd.println("HR");
-  M5.Lcd.println("O2");
+  M5.Lcd.println("IR");
+  M5.Lcd.println("Red");
 
-  if (!pox.begin())
+  if (!MAX30100.begin())
   {
     M5.Lcd.println("FAILED");
   }
@@ -75,6 +82,11 @@ void setup()
     Serial.println("SUCCESS");
   }
 
+  MAX30100.setMode(MAX30100_MODE_SPO2_HR);
+  MAX30100.setLedsCurrent(IR_LED_CURRENT, RED_LED_CURRENT);
+  MAX30100.setLedsPulseWidth(PULSE_WIDTH);
+  MAX30100.setSamplingRate(SAMPLING_RATE);
+  MAX30100.setHighresModeEnabled(HIGHRES_MODE);
   // xTaskCreatePinnedToCore(morseLED, "morseTask", 4096, NULL, 1, NULL, 1);
   // xTaskCreatePinnedToCore(pulseOximeter, "MAX30100", 4096, NULL, 2, NULL, 1);
   pinMode(19, OUTPUT);
@@ -82,18 +94,20 @@ void setup()
 
 void loop()
 {
-  pox.update();
+  MAX30100.update();
+  uint16_t ir, red;
   if (millis() - tsLastReport > REPORTING_PERIOD_MS)
   {
     M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
     M5.Lcd.setCursor(40, 80);
-    float hr = pox.getHeartRate();
-    M5.Lcd.print(hr);
+    // float hr = pox.getHeartRate();
+    MAX30100.getRawValues(&ir, &red);
+    M5.Lcd.print(ir);
 
-    M5.Lcd.setCursor(40, 100);
-    M5.Lcd.print(pox.getSpO2());
+    M5.Lcd.setCursor(50, 110);
+    M5.Lcd.print(red);
 
-    pCharaPOHR->setValue(hr);
+    pCharaPOHR->setValue(ir);
     pCharaPOHR->notify();
 
     tsLastReport = millis();
