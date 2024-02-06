@@ -5,9 +5,9 @@
 #include <MAX30100.h>
 
 #define SERVICE_PULSEOXIMETER_UUID "c360fb9d-497f-4a0d-bfd3-6cbecd1786e1" // パルスオキシメータ
-#define CHARA_PO_HR_UUID "0c1f518c-ffdf-4b0f-8f2f-ca1edc6dabae"           // 心拍数
+#define CHARA_IR_UUID "0c1f518c-ffdf-4b0f-8f2f-ca1edc6dabae"              // 赤外線
 #define Descriptor "55987ddf-24d7-4db8-a4b2-2731852036cd"
-#define CHARA_PO_O2_UUID "1d5b21fa-1a88-4ccb-8be8-9d8f07b0180c" // 酸素濃度
+#define CHARA_RED_UUID "1d5b21fa-1a88-4ccb-8be8-9d8f07b0180c" // 赤色
 #define REPORTING_PERIOD_MS 10
 
 #define SAMPLING_RATE MAX30100_SAMPRATE_100HZ
@@ -33,7 +33,8 @@ void startAdvertising();
 // PulseOximeter pox;
 MAX30100 MAX30100;
 uint32_t tsLastReport = 0;
-BLECharacteristic *pCharaPOHR;
+BLECharacteristic *pCharaIR;
+BLECharacteristic *pCharaRed;
 
 class CorBiServerCallbacks : public BLEServerCallbacks
 {
@@ -107,8 +108,10 @@ void loop()
     M5.Lcd.setCursor(50, 110);
     M5.Lcd.print(red);
 
-    pCharaPOHR->setValue(ir);
-    pCharaPOHR->notify();
+    pCharaIR->setValue(ir);
+    pCharaRed->setValue(red);
+    pCharaIR->notify();
+    pCharaRed->notify();
 
     tsLastReport = millis();
   }
@@ -127,16 +130,25 @@ void startService(BLEServer *pServer)
   // BLEService *pService = pServer->createService(BLEUUID(SERVICE_PULSEOXIMETER_UUID), (uint32_t)0x2800, (uint8_t)0x00); // FIXME ハードコーディングしてるけど、どうしよ
   BLEService *pService = pServer->createService(SERVICE_PULSEOXIMETER_UUID);
 
-  pCharaPOHR = pService->createCharacteristic(
-      CHARA_PO_HR_UUID,
+  pCharaIR = pService->createCharacteristic(
+      CHARA_IR_UUID,
       BLECharacteristic::PROPERTY_READ |
           BLECharacteristic::PROPERTY_WRITE);
-  BLEDescriptor *pDescriptor = new BLEDescriptor(BLEUUID((uint16_t)0x0963)); // FIXME ハードコーディング
+  BLEDescriptor *pDescriptorIR = new BLEDescriptor(BLEUUID((uint16_t)0x0963)); // FIXME ハードコーディング
   // pDescriptor->setValue((uint8_t *)64, 1); // FIXME 使い方いまいち分からん
-  pDescriptor->setValue("Heart Rate"); // Stringで指定ならいける
-  pCharaPOHR->addDescriptor(pDescriptor);
+  pDescriptorIR->setValue("IR"); // Stringで指定ならいける
+  pCharaIR->addDescriptor(pDescriptorIR);
 
-  pCharaPOHR->setValue("963");
+  pCharaRed = pService->createCharacteristic(
+      CHARA_RED_UUID,
+      BLECharacteristic::PROPERTY_READ |
+          BLECharacteristic::PROPERTY_WRITE);
+  BLEDescriptor *pDescriptorRed = new BLEDescriptor(BLEUUID((uint16_t)0x0963)); // FIXME ハードコーディング
+  pDescriptorRed->setValue("Red");
+  pCharaRed->addDescriptor(pDescriptorRed);
+
+  pCharaIR->setValue("963");
+  pCharaRed->setValue("963");
   pService->start();
 }
 
