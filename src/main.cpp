@@ -8,7 +8,10 @@
 #define CHARA_IR_UUID "0c1f518c-ffdf-4b0f-8f2f-ca1edc6dabae"              // 赤外線
 #define Descriptor "55987ddf-24d7-4db8-a4b2-2731852036cd"
 #define CHARA_RED_UUID "1d5b21fa-1a88-4ccb-8be8-9d8f07b0180c" // 赤色
-#define REPORTING_PERIOD_MS 10
+#define REPORTING_PERIOD_MS 100　                             // 10msだと処理が追いつかないっぽかった 100Hzなので、できれば10ms毎に送りたい
+// FIXME なんとか10ms毎に送りたい(まとめて送る案もアリ)
+// NOTE 早すぎるとServiceとか、Characteristicが上手く生成されないっぽい？CorBiCoreじゃなくてBLE Scanとかでも見つからない
+// Issue #14
 
 #define SAMPLING_RATE MAX30100_SAMPRATE_200HZ // 　サンプリング定理より、100Hzあれば十分かも。300BPMまで対応したくて、100Hzあれば標本化できる
 #define IR_LED_CURRENT MAX30100_LED_CURR_50MA
