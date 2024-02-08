@@ -106,12 +106,12 @@ void loop()
     M5.Lcd.setCursor(40, 80);
     // float hr = pox.getHeartRate();
     MAX30100.getRawValues(&ir, &red);
-    M5.Lcd.print(ir);
+    M5.Lcd.print(tsLastReport);
 
     M5.Lcd.setCursor(50, 110);
     M5.Lcd.print(red);
 
-    pCharaIR->setValue(ir);
+    pCharaIR->setValue(tsLastReport);
     pCharaRed->setValue(red);
     pCharaIR->notify();
     pCharaRed->notify();
