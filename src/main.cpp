@@ -119,10 +119,11 @@ void loop()
     if (data_count++ % 20 == 0)
     {
       pCharaIR->setValue(irStr);
-      pCharaRed->setValue(red);
+      pCharaRed->setValue(data_count);
       irStr.clear();
       pCharaIR->notify();
       pCharaRed->notify();
+      // NOTE data_countがオーバーフローした時どうすんねん
     }
 
     tsLastReport = millis();
