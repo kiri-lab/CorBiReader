@@ -8,10 +8,11 @@
 #define CHARA_IR_UUID "0c1f518c-ffdf-4b0f-8f2f-ca1edc6dabae"              // 赤外線
 #define Descriptor "55987ddf-24d7-4db8-a4b2-2731852036cd"
 #define CHARA_RED_UUID "1d5b21fa-1a88-4ccb-8be8-9d8f07b0180c" // 赤色
-#define REPORTING_PERIOD_MS 20                                // 10msだと処理が追いつかないっぽかった 100Hzなので、できれば10ms毎に送りたい
+#define REFRESH_PERIOD_MS 10                                  // 10msだと処理が追いつかないっぽかった 100Hzなので、できれば10ms毎に送りたい
+#define REPORTING_PERIOD_MS 200
 // FIXME なんとか10ms毎に送りたい(まとめて送る案もアリ)
 // NOTE 早すぎるとServiceとか、Characteristicが上手く生成されないっぽい？CorBiCoreじゃなくてBLE Scanとかでも見つからない
-// Issue #14
+// Issue #14 #17
 
 #define SAMPLING_RATE MAX30100_SAMPRATE_200HZ // 　サンプリング定理より、100Hzあれば十分かも。300BPMまで対応したくて、100Hzあれば標本化できる
 #define IR_LED_CURRENT MAX30100_LED_CURR_27_1MA
@@ -100,21 +101,29 @@ void loop()
 {
   MAX30100.update();
   uint16_t ir, red;
-  if (millis() - tsLastReport > REPORTING_PERIOD_MS)
+  static int data_count = 0;
+  static std::string irStr = "";
+  if (millis() - tsLastReport > REFRESH_PERIOD_MS)
   {
     M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
     M5.Lcd.setCursor(40, 80);
     // float hr = pox.getHeartRate();
     MAX30100.getRawValues(&ir, &red);
-    M5.Lcd.print(tsLastReport);
+    M5.Lcd.print(irStr.c_str());
 
     M5.Lcd.setCursor(50, 110);
     M5.Lcd.print(red);
+    irStr.push_back((ir >> 8) & 0xff);
+    irStr.push_back(ir & 0xff);
 
-    pCharaIR->setValue(tsLastReport);
-    pCharaRed->setValue(red);
-    pCharaIR->notify();
-    pCharaRed->notify();
+    if (data_count++ % 20 == 0)
+    {
+      pCharaIR->setValue(irStr);
+      pCharaRed->setValue(red);
+      irStr.clear();
+      pCharaIR->notify();
+      pCharaRed->notify();
+    }
 
     tsLastReport = millis();
   }
