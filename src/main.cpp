@@ -41,6 +41,7 @@ MAX30100 MAX30100;
 uint32_t tsLastReport = 0;
 BLECharacteristic *pCharaIR;
 BLECharacteristic *pCharaRed;
+BLECharacteristic *pCharaOrder;
 
 class CorBiServerCallbacks : public BLEServerCallbacks
 {
@@ -122,6 +123,7 @@ void loop()
     {
       pCharaIR->setValue(irStr);
       pCharaRed->setValue(data_count);
+      pCharaOrder->setValue(data_count);
       irStr.clear();
       pCharaIR->notify();
       pCharaRed->notify();
@@ -162,8 +164,16 @@ void startService(BLEServer *pServer)
   pDescriptorRed->setValue("Red");
   pCharaRed->addDescriptor(pDescriptorRed);
 
+  pCharaOrder = pService->createCharacteristic(
+      CHARA_ORDER_UUID,
+      BLECharacteristic::PROPERTY_READ);
+  BLEDescriptor *pDescriptorOrder = new BLEDescriptor(BLEUUID((uint16_t)0x0963)); // FIXME ハードコーディング
+  pDescriptorOrder->setValue("Order");
+  pCharaOrder->addDescriptor(pDescriptorOrder);
+
   pCharaIR->setValue("963");
   pCharaRed->setValue("963");
+  pCharaOrder->setValue("963");
   pService->start();
 }
 
