@@ -14,6 +14,8 @@
 // NOTE 早すぎるとServiceとか、Characteristicが上手く生成されないっぽい？CorBiCoreじゃなくてBLE Scanとかでも見つからない
 // Issue #14 #17
 
+#define CHARA_ORDER_UUID "9331cae2-0aec-4a90-a44b-7cde8cbc3257"
+
 #define SAMPLING_RATE MAX30100_SAMPRATE_200HZ // 　サンプリング定理より、100Hzあれば十分かも。300BPMまで対応したくて、100Hzあれば標本化できる
 #define IR_LED_CURRENT MAX30100_LED_CURR_27_1MA
 #define RED_LED_CURRENT MAX30100_LED_CURR_27_1MA
@@ -109,7 +111,7 @@ void loop()
     M5.Lcd.setCursor(40, 80);
     // float hr = pox.getHeartRate();
     MAX30100.getRawValues(&ir, &red);
-    M5.Lcd.print(irStr.c_str());
+    M5.Lcd.print(ir);
 
     M5.Lcd.setCursor(50, 110);
     M5.Lcd.print(red);
