@@ -6,15 +6,14 @@
 
 #define SERVICE_PULSEOXIMETER_UUID "c360fb9d-497f-4a0d-bfd3-6cbecd1786e1" // パルスオキシメータ
 #define CHARA_IR_UUID "0c1f518c-ffdf-4b0f-8f2f-ca1edc6dabae"              // 赤外線
+#define CHARA_RED_UUID "1d5b21fa-1a88-4ccb-8be8-9d8f07b0180c"             // 赤色
+#define CHARA_ORDER_UUID "9331cae2-0aec-4a90-a44b-7cde8cbc3257"
 #define Descriptor "55987ddf-24d7-4db8-a4b2-2731852036cd"
-#define CHARA_RED_UUID "1d5b21fa-1a88-4ccb-8be8-9d8f07b0180c" // 赤色
-#define REFRESH_PERIOD_MS 10                                  // 10msだと処理が追いつかないっぽかった 100Hzなので、できれば10ms毎に送りたい
+#define REFRESH_PERIOD_MS 10 // 10msだと処理が追いつかないっぽかった 100Hzなので、できれば10ms毎に送りたい
 #define REPORTING_PERIOD_MS 200
 // FIXME なんとか10ms毎に送りたい(まとめて送る案もアリ)
 // NOTE 早すぎるとServiceとか、Characteristicが上手く生成されないっぽい？CorBiCoreじゃなくてBLE Scanとかでも見つからない
 // Issue #14 #17
-
-#define CHARA_ORDER_UUID "9331cae2-0aec-4a90-a44b-7cde8cbc3257"
 
 #define SAMPLING_RATE MAX30100_SAMPRATE_200HZ // 　サンプリング定理より、100Hzあれば十分かも。300BPMまで対応したくて、100Hzあれば標本化できる
 #define IR_LED_CURRENT MAX30100_LED_CURR_27_1MA
