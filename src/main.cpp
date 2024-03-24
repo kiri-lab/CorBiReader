@@ -105,6 +105,7 @@ void loop()
   uint16_t ir, red;
   static int data_count = 0;
   static std::string irStr = "";
+  static std::string redStr = "";
   if (millis() - tsLastReport > REFRESH_PERIOD_MS)
   {
     M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
@@ -117,11 +118,13 @@ void loop()
     M5.Lcd.print(red);
     irStr.push_back((ir >> 8) & 0xff);
     irStr.push_back(ir & 0xff);
+    redStr.push_back((red >> 8) & 0xff);
+    redStr.push_back(red & 0xff);
 
-    if (data_count++ % 20 == 0)
+    if (data_count++ % 10 == 0) // NOTE なんかデータ送信か受信がおかしいかも。　受信側で表示できてない
     {
       pCharaIR->setValue(irStr);
-      pCharaRed->setValue(data_count);
+      pCharaRed->setValue(redStr);
       pCharaOrder->setValue(data_count);
       irStr.clear();
       pCharaIR->notify();
