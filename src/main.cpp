@@ -47,11 +47,13 @@ class CorBiServerCallbacks : public BLEServerCallbacks
   void onConnect(BLEServer *pServer)
   {
     M5.Lcd.println("Connected");
+    BLEDevice::stopAdvertising();
   }
 
   void onDisconnect(BLEServer *pServer)
   {
     M5.Lcd.println("Disconnected");
+    BLEDevice::startAdvertising();
   }
 };
 
