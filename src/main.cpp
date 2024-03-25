@@ -121,12 +121,13 @@ void loop()
     redStr.push_back((red >> 8) & 0xff);
     redStr.push_back(red & 0xff);
 
-    if (data_count++ % 10 == 0) // NOTE なんかデータ送信か受信がおかしいかも。　受信側で表示できてない
+    if (data_count++ % 20 == 0) // NOTE なんかデータ送信か受信がおかしいかも。　受信側で表示できてない
     {
       pCharaIR->setValue(irStr);
       pCharaRed->setValue(redStr);
       pCharaOrder->setValue(data_count);
       irStr.clear();
+      redStr.clear();
       pCharaIR->notify();
       pCharaRed->notify();
       // NOTE data_countがオーバーフローした時どうすんねん
