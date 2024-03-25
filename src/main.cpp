@@ -77,8 +77,8 @@ void setup()
   M5.Lcd.setTextColor(TFT_PURPLE, TFT_BLACK);
   M5.Lcd.println("kiri-lab");
   M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
-  M5.Lcd.println("IR");
-  M5.Lcd.println("Red");
+  // M5.Lcd.println("IR");
+  // M5.Lcd.println("Red");
 
   if (!MAX30100.begin())
   {
@@ -108,14 +108,14 @@ void loop()
   static std::string redStr = "";
   if (millis() - tsLastReport > REFRESH_PERIOD_MS)
   {
-    M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
-    M5.Lcd.setCursor(40, 80);
+    // M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
+    // M5.Lcd.setCursor(40, 80);
     // float hr = pox.getHeartRate();
     MAX30100.getRawValues(&ir, &red);
-    M5.Lcd.print(ir);
+    // M5.Lcd.print(ir);
 
-    M5.Lcd.setCursor(50, 110);
-    M5.Lcd.print(red);
+    // M5.Lcd.setCursor(50, 110);
+    // M5.Lcd.print(red);
     irStr.push_back((ir >> 8) & 0xff);
     irStr.push_back(ir & 0xff);
     redStr.push_back((red >> 8) & 0xff);
